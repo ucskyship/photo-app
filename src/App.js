@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Search from "./component/Search";
+import { useState, useEffect } from "react";
+import { unsplash } from "./api/Unsplash";
+import ImageList from "./component/ImageList";
 
-function App() {
+const App = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [images, setImageList] = useState([]);
+  const getSearchTerm = (term) => {
+    setSearchTerm(term);
+  };
+
+  useEffect(() => {
+      const fetchPhotos = async () => {
+          const result = await unsplash.get(`/search/photos/?query=${searchTerm}`);
+          console.log(result);
+          setImageList(result.data.results);
+      }
+      fetchPhotos();
+  }, [searchTerm]);
+
+  useEffect(()=> {
+    const fetchPhotos = async () => {
+      const result = await unsplash.get(`/photos/random?count=30`);
+      setImageList(result.data);
+    }
+    fetchPhotos();
+  }, [])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Search getSearchTerm={getSearchTerm} />
+      <ImageList data={images}/>
     </div>
   );
-}
+};
 
 export default App;
